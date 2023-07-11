@@ -3,7 +3,6 @@ package org.openapitools.controller;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.openapitools.api.ApiException;
 import org.openapitools.model.dto.CreateReminderRequest;
@@ -14,6 +13,8 @@ import org.openapitools.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -30,35 +31,35 @@ public class TaskApiController implements TaskApi {
 	}
 
 	@Override
-	public ResponseEntity<TaskResponse> getTask(Long taskId) throws ApiException {
-		return new ResponseEntity<>(taskService.getTaskByUserIdAndTaskId(taskId), HttpStatus.OK);
+	public ResponseEntity<TaskResponse> getTask(Long taskId, @AuthenticationPrincipal OidcUser oidcUser) throws ApiException {
+		return new ResponseEntity<>(taskService.getTaskByUserIdAndTaskId(taskId, oidcUser), HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<List<TaskResponse>> listTasks() {
-		return new ResponseEntity<>(taskService.getAllTasksByUserId(), HttpStatus.OK);
+	public ResponseEntity<List<TaskResponse>> listTasks(@AuthenticationPrincipal OidcUser oidcUser) {
+		return new ResponseEntity<>(taskService.getAllTasksByUserId(oidcUser), HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<TaskResponse> createTask(TaskCreateRequest taskCreateRequest) throws ApiException {
-		return new ResponseEntity<>(taskService.createTask(taskCreateRequest), HttpStatus.OK);
+	public ResponseEntity<TaskResponse> createTask(TaskCreateRequest taskCreateRequest, @AuthenticationPrincipal OidcUser oidcUser) throws ApiException {
+		return new ResponseEntity<>(taskService.createTask(taskCreateRequest, oidcUser), HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<TaskResponse> updateTask(Long taskId, TaskUpdateRequest taskUpdateRequest) throws ApiException {
-		return new ResponseEntity<>(taskService.updateTask(taskId, taskUpdateRequest), HttpStatus.OK);
+	public ResponseEntity<TaskResponse> updateTask(Long taskId, TaskUpdateRequest taskUpdateRequest, @AuthenticationPrincipal OidcUser oidcUser)
+			throws ApiException {
+		return new ResponseEntity<>(taskService.updateTask(taskId, taskUpdateRequest, oidcUser), HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<Void> deleteTask(Long taskId) throws ApiException {
-		taskService.deleteTask(taskId);
+	public ResponseEntity<Void> deleteTask(Long taskId, @AuthenticationPrincipal OidcUser oidcUser) throws ApiException {
+		taskService.deleteTask(taskId, oidcUser);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@Override
-	@RolesAllowed(OAUTH_USER)
+	//@RolesAllowed(OAUTH_USER)
 	public ResponseEntity<TaskResponse> createTaskReminder(Long taskId, CreateReminderRequest reminderRequest) throws ApiException {
-		return new ResponseEntity<>(
-				taskService.createTaskReminder(taskId, reminderRequest), HttpStatus.OK);
+		return new ResponseEntity<>(taskService.createTaskReminder(taskId, reminderRequest), HttpStatus.OK);
 	}
 }

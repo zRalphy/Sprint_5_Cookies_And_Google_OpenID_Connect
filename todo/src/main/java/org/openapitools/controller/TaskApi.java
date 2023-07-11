@@ -27,6 +27,7 @@ import org.openapitools.model.dto.TaskUpdateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,7 +63,7 @@ public interface TaskApi {
 			value = "/task",
 			produces = {"application/json"}
 	)
-	default ResponseEntity<List<TaskResponse>> listTasks() {
+	default ResponseEntity<List<TaskResponse>> listTasks(@Parameter(name = "OidcUser", description = "", required = true) @Valid OidcUser oidcUser) {
 		getRequest().ifPresent(request -> {
 			for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
 				if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -104,7 +105,8 @@ public interface TaskApi {
 			produces = {"application/json"}
 	)
 	default ResponseEntity<TaskResponse> getTask(
-			@Parameter(name = "taskId", description = "Task identifier", required = true, in = ParameterIn.PATH) @PathVariable("taskId") Long taskId)
+			@Parameter(name = "taskId", description = "Task identifier", required = true, in = ParameterIn.PATH) @PathVariable("taskId") Long taskId,
+			@Parameter(name = "OidcUser", description = "", required = true) @Valid OidcUser oidcUser)
 			throws ApiException {
 		getRequest().ifPresent(request -> {
 			for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -144,7 +146,8 @@ public interface TaskApi {
 			consumes = {"application/json"}
 	)
 	default ResponseEntity<TaskResponse> createTask(
-			@Parameter(name = "TaskCreateRequest", description = "", required = true) @Valid @RequestBody TaskCreateRequest taskCreateRequest)
+			@Parameter(name = "TaskCreateRequest", description = "", required = true) @Valid @RequestBody TaskCreateRequest taskCreateRequest,
+			@Parameter(name = "OidcUser", description = "", required = true) @Valid OidcUser oidcUser)
 			throws ApiException {
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
@@ -182,7 +185,8 @@ public interface TaskApi {
 	)
 	default ResponseEntity<TaskResponse> updateTask(
 			@Parameter(name = "taskId", description = "Task identifier", required = true, in = ParameterIn.PATH) @PathVariable("taskId") Long taskId,
-			@Parameter(name = "TaskUpdateRequest", description = "", required = true) @Valid @RequestBody TaskUpdateRequest taskUpdateRequest)
+			@Parameter(name = "TaskUpdateRequest", description = "", required = true) @Valid @RequestBody TaskUpdateRequest taskUpdateRequest,
+			@Parameter(name = "OidcUser", description = "", required = true) @Valid OidcUser oidcUser)
 			throws ApiException {
 		getRequest().ifPresent(request -> {
 			for (MediaType mediaType : MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -222,7 +226,8 @@ public interface TaskApi {
 			value = "/task/{taskId}"
 	)
 	default ResponseEntity<Void> deleteTask(
-			@Parameter(name = "taskId", description = "Task identifier", required = true, in = ParameterIn.PATH) @PathVariable("taskId") Long taskId)
+			@Parameter(name = "taskId", description = "Task identifier", required = true, in = ParameterIn.PATH) @PathVariable("taskId") Long taskId,
+			@Parameter(name = "OidcUser", description = "", required = true) @Valid OidcUser oidcUser)
 			throws ApiException {
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
